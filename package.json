@@ -1,0 +1,33 @@
+{
+  "name": "plugge",
+  "version": "0.1.1",
+  "description": "基于上下文的高性能高可靠轻量的插件化库",
+  "main": "lib/index.js",
+  "scripts": {
+    "start": "tsc -w",
+    "prepublish": "tsc && npm run t",
+    "test": "tsc && mocha",
+    "t": "nyc mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/etoah/plugge.git"
+  },
+  "keywords": [],
+  "author": "lucienduan",
+  "license": "BSD",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^10.12.9",
+    "cross-env": "^5.1.4",
+    "mocha": "^5.2.0",
+    "nyc": "^13.1.0",
+    "should": "^13.2.3"
+  },
+  "nyc": {
+    "reporter": [
+      "html",
+      "text-summary"
+    ]
+  }
+}

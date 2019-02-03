@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES5",          
+    "module": "commonjs",    
+    "experimentalDecorators": true,              
+    "declaration": true,                    
+    "outDir": "lib",                                      
+    "allowSyntheticDefaultImports": true,    
+    "esModuleInterop": true,   
+    "lib": ["es5", "es2015"],     
+  },
+  "types": [
+    "node"
+  ], 
+  "exclude": [
+    "node_modules",
+    "test/**/*.ts",
+    "lib"
+  ] 
+}
