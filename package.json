@@ -1,6 +1,6 @@
 {
   "name": "plugge",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "description": "基于上下文的高性能高可靠轻量的插件化库",
   "main": "lib/index.js",
   "scripts": {
