@@ -10,6 +10,7 @@
     - 异步串行：`emitAsyncSeries`: 用于串行执行插件Hook, 用于插件间有数据或流程上的依赖;
     - 单次：`once/onceSync`: 触发后解绑;
     - 同/异步：`on/onSync`: 同步执行时该时该的插件可以马上获取数据变更， 异步时，有分片性能更好; 
+    - 所有/任一: `onEveryOnce/onAnyOnce`: 监听事件列表的所有/任一事件触发时触发回调
     - 支持事件的优先级和分包加载;
     - 支持实现有序广播和拦截广播: 拦截广播主要用于事件Hook没有处理时， 有兜底的行为。比如关机事件， 当没有软件处理关机事件， 需要正常关机;
 4. **中心式的事件分发**： 避免网状的信息流，过长的调用链引起的事件泥潭和缺陷定位复杂.
@@ -92,10 +93,10 @@ pluggable内未实现广播的拦截, 但可以结合 `priority`, `context`很�
 除了Typscript 生成的函数外, 函数覆盖率100%, 行覆盖率99%以上
 ```
 =============================== Coverage summary ===============================
-Statements   : 92.59% ( 250/270 )
-Branches     : 78.2% ( 104/133 )
-Functions    : 95.77% ( 68/71 )
-Lines        : 98.18% ( 216/220 )
+Statements   : 93.22% ( 275/295 )
+Branches     : 78.72% ( 111/141 )
+Functions    : 96.3% ( 78/81 )
+Lines        : 98.31% ( 233/237 )
 ================================================================================
 ```
 
@@ -108,7 +109,7 @@ npm t
 ### Built With
 
 - 腾讯视频漫画阅读器
-- Glame(腾讯视频内部框架)
+- Glama(腾讯视频内部框架)
 
 ### 兼容性
 支持所有浏览器和node版本, 但`Chrome 45`, `Safari 8`, `Node 4` 以下注意`polyfill`以下api.
@@ -127,7 +128,16 @@ generator (for async)
 详情使用请查看源码`test`文件测试用例.
 
 ```typescript
-import { ListenerDetail } from "./EventInfo";
+export declare class ListenerDetail {
+    /**
+     * 建议小于 10000, 大于10000内部使用
+     *
+     * @type {number}
+     * @memberof ListenerDetail
+     */
+    priority?: number;
+    constructor(priority?: number);
+}
 export declare enum PluggableInnerEvent {
     PluggableReady = "PluggableReady",
     PluggableHookError = "PluggableHookError"
@@ -181,7 +191,7 @@ export default class Pluggable<Context> {
      * @returns
      * @memberof Pluggable
      */
-    emitAsyncParalle(event: string, ...args: any[]): Promise<[{}, {}, {}, {}, {}, {}, {}, {}, {}, {}]>;
+    emitAsyncParalle(event: string, ...args: any[]): Promise<any[]>;
     /**
      * 异步串行执行事件, , onSync生效
      *
@@ -191,6 +201,24 @@ export default class Pluggable<Context> {
     emitAsyncSeries(event: string, ...args: any[]): Promise<any>;
     once(event: string, callback: Function, detail?: ListenerDetail): void;
     onceSync(event: string, callback: Function, detail?: ListenerDetail): void;
+    /**
+     * 当events列表中所有事件发生时触发回调， 只触发一次
+     *
+     * @param {string[]} events
+     * @param {Function} callback
+     * @param {ListenerDetail} [detail]
+     * @memberof Pluggable
+     */
+    onEveryOnce(events: string[], callback: Function, detail?: ListenerDetail): void;
+    /**
+     * 当events列表中任意事件发生时触发回调, 只触发一次
+     *
+     * @param {string[]} events
+     * @param {Function} callback
+     * @param {ListenerDetail} [detail]
+     * @memberof Pluggable
+     */
+    onAnyOnce(events: string[], callback: Function, detail?: ListenerDetail): void;
     /**
      * 注册可能已触发的事件， 用于Ready, beforeReady等只触发一次的事件Hook
      *

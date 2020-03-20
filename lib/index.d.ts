@@ -58,7 +58,7 @@ export default class Pluggable<Context> {
      * @returns
      * @memberof Pluggable
      */
-    emitAsyncParalle(event: string, ...args: any[]): Promise<[{}, {}, {}, {}, {}, {}, {}, {}, {}, {}]>;
+    emitAsyncParalle(event: string, ...args: any[]): Promise<[unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown]>;
     /**
      * 异步串行执行事件, , onSync生效
      *
@@ -68,6 +68,24 @@ export default class Pluggable<Context> {
     emitAsyncSeries(event: string, ...args: any[]): Promise<any>;
     once(event: string, callback: Function, detail?: ListenerDetail): void;
     onceSync(event: string, callback: Function, detail?: ListenerDetail): void;
+    /**
+     * 当events列表中所有事件发生时触发回调， 只触发一次
+     *
+     * @param {string[]} events
+     * @param {Function} callback
+     * @param {ListenerDetail} [detail]
+     * @memberof Pluggable
+     */
+    onEveryOnce(events: string[], callback: Function, detail?: ListenerDetail): void;
+    /**
+     * 当events列表中任意事件发生时触发回调, 只触发一次
+     *
+     * @param {string[]} events
+     * @param {Function} callback
+     * @param {ListenerDetail} [detail]
+     * @memberof Pluggable
+     */
+    onAnyOnce(events: string[], callback: Function, detail?: ListenerDetail): void;
     /**
      * 注册可能已触发的事件， 用于Ready, beforeReady等只触发一次的事件Hook
      *

@@ -1,97 +1,121 @@
 const Pluggable = require('../').default
-function wait (t){
-  return new Promise((rs, rj)=>{
+function wait(t) {
+  return new Promise((rs, rj) => {
     setTimeout(rs, t)
   })
 }
 
-describe('pluggable Sync API e2e test', function() {
-  before(()=>{
+describe('pluggable Sync API e2e test', function () {
+  before(() => {
     console._error = console.error
-    console.error = function(){}
+    console.error = function () { }
   })
-  
-  after(()=>{
+
+  after(() => {
     console.error = console._error
   })
 
-  it('init ', function(done) {
+  it('init ', function (done) {
     const plug = new Pluggable()
-    plug.onAlready('PluggableReady', function(){
+    plug.onAlready('PluggableReady', function () {
       plug.destroy()
       done()
     })
   });
 
-  it('onSync & emit ', function(done) {
+  it('onSync & emit ', function (done) {
     const plug = new Pluggable()
-    plug.onSync('a', function(params){params.b.should.be.eql(1); done()})
-    plug.emit('a', {b: 1})
+    plug.onSync('a', function (params) { params.b.should.be.eql(1); done() })
+    plug.emit('a', { b: 1 })
   });
 
-  it('onSync multi & emit ', function(done) {
+  it('onSync multi & emit ', function (done) {
     const plug = new Pluggable()
     var count = 0
-    plug.onSync('a,b', function(params){count += params.b})
-    plug.emit('a', {b: 1})
-    plug.emit('b', {b: 2})
+    plug.onSync('a,b', function (params) { count += params.b })
+    plug.emit('a', { b: 1 })
+    plug.emit('b', { b: 2 })
     count.should.be.eql(3)
     done()
   });
 
 
-  it('onSync & emit & remove ', function(done) {
+  it('onSync & emit & remove ', function (done) {
     const plug = new Pluggable()
-    function f(params){params.b.should.be.eql(1);} 
+    function f(params) { params.b.should.be.eql(1); }
     plug.onSync('a', f)
-    plug.emit('a', {b: 1})
+    plug.emit('a', { b: 1 })
     plug.off('a', f)
-    plug.emit('a', {b: 2})
-    setTimeout(()=>done())
+    plug.emit('a', { b: 2 })
+    setTimeout(() => done())
   });
 
-  it('onceSync & emit ', function(done) {
+  it('onceSync & emit ', function (done) {
     const plug = new Pluggable()
-    plug.onceSync('a', function(params){params.b.should.be.eql(1);})
-    plug.emit('a', {b: 1})
-    plug.emit('a', {b: 2})
+    plug.onceSync('a', function (params) { params.b.should.be.eql(1); })
+    plug.emit('a', { b: 1 })
+    plug.emit('a', { b: 2 })
 
-    setTimeout(()=>done())
+    setTimeout(() => done())
   });
 
-  it('onAlreadySync & emit ', function(done) {
+  it('onAlreadySync & emit ', function (done) {
     const plug = new Pluggable()
-    plug.emit('a', {b: 1})
-    plug.onAlreadySync('a', function(params){params.b.should.be.eql(1); done()})
+    plug.emit('a', { b: 1 })
+    plug.onAlreadySync('a', function (params) { params.b.should.be.eql(1); done() })
   });
 
-  it('onAlreadySync & once  ', function(done) {
+  it('onAlreadySync & once  ', function (done) {
     const plug = new Pluggable()
-    plug.onAlreadySync('a', function(params){params.b.should.be.eql(1)})
-    plug.emit('a', {b: 1})
-    plug.emit('a', {b: 2})
-    setTimeout(done, 10)
+    plug.onAlreadySync('a', function (params) { params.b.should.be.eql(1); done() })
+    plug.emit('a', { b: 1 })
+    plug.emit('a', { b: 2 })
   });
 
 
-  it('onAlreadySync emit null params ', function(done) {
+  it('onAlreadySync emit null params ', function (done) {
     const plug = new Pluggable()
     plug.emit('a')
-    plug.onAlreadySync('a', function(){ done()})
+    plug.onAlreadySync('a', function () { done() })
   });
 
-  it('plugin', function(done) {
+  it('onEveryOnce', function (done) {
     const plug = new Pluggable()
-    plug.registerPlugin(function(){
-      this.onSync('a', function(){
-        this.context = {b: 1}
+    plug.onEveryOnce(['a', 'b'], (params) => {
+      params.should.be.eql([1, 2]);
+    })
+    plug.emit('a', 1)
+    plug.emit('b', 2)
+    plug.emit('a', 3)
+    plug.emit('b', 4) // 验证只触发一次
+    setTimeout(done, 20);
+  });
+
+  it('onAnyOnce', function (done) {
+    const plug = new Pluggable()
+    plug.onAnyOnce(['a', 'b'], (params) => {
+      params.should.be.eql(1);
+    })
+    plug.emit('a', 1)
+    plug.emit('b', 2)
+    plug.emit('a', 3)
+    plug.emit('b', 4) // 验证只触发一次
+    setTimeout(done, 20);
+  });
+
+
+  it('plugin', function (done) {
+    const plug = new Pluggable()
+    plug.registerPlugin(function () {
+      this.onSync('a', function () {
+        this.context = { b: 1 }
       })
 
-      this.onSync('b', function(){
+      this.onSync('b', function () {
         this.context.b = this.context.b + 1
       })
 
-      this.onSync('c', function(t){
+      this.onSync('c', function (t) {
         this.context.c = t
       })
     })
@@ -100,7 +124,7 @@ describe('pluggable Sync API e2e test', function() {
     plug.emit('b')
     plug.emit('c', 3)
 
-    setTimeout(()=>{
+    setTimeout(() => {
       plug.context.b.should.be.eql(2)
       plug.context.c.should.be.eql(3)
       done()
@@ -108,19 +132,19 @@ describe('pluggable Sync API e2e test', function() {
 
   });
 
-  it('emitAsyncSeries', async function() {
+  it('emitAsyncSeries', async function () {
     const plug = new Pluggable()
-    plug.onSync('a', async function(){
+    plug.onSync('a', async function () {
       await wait(10)
-      this.context = {b: 1}
+      this.context = { b: 1 }
     })
 
-    plug.onSync('a', function(){
+    plug.onSync('a', function () {
       this.context.b += 1
       this.context.b.should.be.eql(2)
     })
 
-    plug.onSync('a', function(){
+    plug.onSync('a', function () {
       this.context.b += 1
       this.context.b.should.be.eql(3)
     })
@@ -128,21 +152,21 @@ describe('pluggable Sync API e2e test', function() {
     return await plug.emitAsyncSeries('a')
   })
 
-  it('emitAsyncSeries with error', async function() {
+  it('emitAsyncSeries with error', async function () {
     console._error = console.error
     const plug = new Pluggable()
-    plug.onSync('a', async function(){
+    plug.onSync('a', async function () {
       await wait(10)
-      this.context = {b: 1}
+      this.context = { b: 1 }
     })
 
-    plug.onSync('a', function(){
+    plug.onSync('a', function () {
       this.context.b += 1
       this.context.b.should.be.eql(2)
       throw new Error('test error')
     })
 
-    plug.onSync('a', function(){
+    plug.onSync('a', function () {
       this.context.b += 1
       this.context.b.should.be.eql(3)
     })
@@ -152,40 +176,40 @@ describe('pluggable Sync API e2e test', function() {
     } catch (error) {
       console.log('error', error)
       should(null).be.ok() //不能到达
-    } 
-    
+    }
+
   })
 
-  it('emitAsyncParalle ', async function() {
+  it('emitAsyncParalle ', async function () {
     const plug = new Pluggable()
-    
-    plug.onSync('a', async function(){
+
+    plug.onSync('a', async function () {
       await wait(105)
       this.context.b += 1
       this.context.b.should.be.eql(2)
     })
 
-    plug.onSync('a', async function(){
+    plug.onSync('a', async function () {
       await wait(100)
-      this.context = {b: 1}
+      this.context = { b: 1 }
     })
 
     await plug.emitAsyncParalle('a')
     plug.context.b.should.be.eql(2)
   })
 
-  it('emitAsyncParalle with error', async function() {
+  it('emitAsyncParalle with error', async function () {
     const plug = new Pluggable()
-    plug.onSync('a', async function(){
+    plug.onSync('a', async function () {
       await wait(10)
-      this.context = {b: 1}
+      this.context = { b: 1 }
     })
 
-    plug.onSync('a', function(){
+    plug.onSync('a', function () {
       this.context.b += 1
       this.context.b.should.be.eql(2)
     })
-    
+
     try {
       await plug.emitAsyncParalle('a')
       should(plug.context).be.ok()
@@ -193,8 +217,8 @@ describe('pluggable Sync API e2e test', function() {
     } catch (error) {
       console.log('error', error)
       should(null).be.ok() //不能到达
-      
-    } 
+
+    }
   })
 
 });
