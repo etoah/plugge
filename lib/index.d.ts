@@ -5,7 +5,7 @@ export declare enum PluggableInnerEvent {
 }
 export default class Pluggable<Context> {
     static disableChunk: boolean;
-    static defaultPlugins: Array<Function>;
+    static defaultPlugins: Array<(this: Pluggable<any>) => any>;
     isNodeEnv: boolean;
     private events;
     /**
@@ -17,7 +17,7 @@ export default class Pluggable<Context> {
     /**
      * 注册默认的插件，在实例化前调用
      */
-    static registerDefaultPlugin(plugins: any): void;
+    static registerDefaultPlugin(plugins: Array<(this: Pluggable<any>) => any>): void;
     /**
      *Creates an instance of Pluggable.
      * @param {boolean} [isPure=false] 纯净的实例不会生成eventBus, 不会注册默认插件，只提供基础的发布订阅能力

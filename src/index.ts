@@ -10,7 +10,7 @@ export enum PluggableInnerEvent {
 
 export default class Pluggable<Context> {
   static disableChunk: boolean = false;
-  static defaultPlugins: Array<Function> = []
+  static defaultPlugins: Array<(this: Pluggable<any>) => any> = []
   isNodeEnv: boolean = isNodeEnv
   private events: Event
   /**
@@ -23,7 +23,7 @@ export default class Pluggable<Context> {
   /**
    * 注册默认的插件，在实例化前调用
    */
-  static registerDefaultPlugin(plugins) {
+  static registerDefaultPlugin(plugins: Array<(this: Pluggable<any>) => any>) {
     Pluggable.defaultPlugins = Pluggable.defaultPlugins.concat(plugins)
   }
 
