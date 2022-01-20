@@ -24,6 +24,9 @@
     "nyc": "^13.1.0",
     "should": "^13.2.3"
   },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
   "nyc": {
     "reporter": [
       "html",

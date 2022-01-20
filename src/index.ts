@@ -23,7 +23,7 @@ export default class Pluggable<Context> {
   /**
    * 注册默认的插件，在实例化前调用
    */
-  static registerDefaultPlugin(plugins: Array<(this: Pluggable<any>) => any>) {
+  static registerDefaultPlugin<Context>(plugins: Array<(this: Pluggable<Context>) => any>) {
     Pluggable.defaultPlugins = Pluggable.defaultPlugins.concat(plugins)
   }
 
